@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruleta de Nombres</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .ruleta-container {
+            position: relative;
+        }
+        .ruleta {
+            width: 350px;
+            height: 350px;
+            border-radius: 50%;
+            overflow: hidden;
+            position: relative;
+            transition: transform 3s ease-out;
+        }
+        .flecha {
+            width: 0; 
+            height: 0; 
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 30px solid black;
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        svg {
+            transform: rotate(-90deg);
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>¿A quién le tocará hoy...?</h1>
+    <div class="ruleta-container">
+        <div class="flecha"></div>
+        <div class="ruleta" id="ruleta">
+            <svg width="350" height="350" viewBox="0 0 350 350">
+                <g id="slices"></g>
+            </svg>
+        </div>
+    </div>
+    <button onclick="girarRuleta()">Girar</button>
+
+    <script>
+        const nombres = ["IRENE", "XABI", "BETSY", "PENÉLOPE", "SAIOA", "JULEN", "ANGY", "IMANOL", "IRATI", "LEIRE", "AMAIA", "SERGIO", "HANAN"];
+        const numNombres = nombres.length;
+        const ruleta = document.getElementById("ruleta");
+        const slicesContainer = document.getElementById("slices");
+        const anglePerSlice = 360 / numNombres;
+        
+        function dibujarRuleta() {
+            nombres.forEach((nombre, index) => {
+                let angleStart = index * anglePerSlice;
+                let angleEnd = (index + 1) * anglePerSlice;
+                let color = `hsl(${index * (360 / numNombres)}, 100%, 50%)`;
+                
+                let path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                let x1 = 175 + 175 * Math.cos(angleStart * Math.PI / 180);
+                let y1 = 175 + 175 * Math.sin(angleStart * Math.PI / 180);
+                let x2 = 175 + 175 * Math.cos(angleEnd * Math.PI / 180);
+                let y2 = 175 + 175 * Math.sin(angleEnd * Math.PI / 180);
+                
+                path.setAttribute("d", `M175,175 L${x1},${y1} A175,175 0 0,1 ${x2},${y2} Z`);
+                path.setAttribute("fill", color);
+                
+                let textAngle = (angleStart + angleEnd) / 2;
+                let textX = 175 + 120 * Math.cos(textAngle * Math.PI / 180);
+                let textY = 175 + 120 * Math.sin(textAngle * Math.PI / 180);
+                
+                let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", textX);
+                text.setAttribute("y", textY);
+                text.setAttribute("fill", "white");
+                text.setAttribute("font-size", "14");
+                text.setAttribute("font-weight", "bold");
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("dominant-baseline", "middle");
+                text.textContent = nombre;
+                
+                slicesContainer.appendChild(path);
+                slicesContainer.appendChild(text);
+            });
+        }
+        
+        function girarRuleta() {
+            let vueltas = Math.floor(Math.random() * 10) + 5;
+            let anguloFinal = vueltas * 360 + Math.floor(Math.random() * 360);
+            ruleta.style.transform = `rotate(${anguloFinal}deg)`;
+            
+            setTimeout(() => {
+                let index = Math.floor(((anguloFinal % 360) / anglePerSlice));
+                alert("El nombre elegido es: " + nombres[index]);
+            }, 3000);
+        }
+
+        dibujarRuleta();
+    </script>
+</body>
+</html>
+
